@@ -18,11 +18,8 @@ const FRAME_COUNT = 8;
 // How fast to switch frames (ms)
 const FRAME_INTERVAL_MS = 900;
 
-// IMPORTANT: keep your real key local on your machine.
-// Replace YOUR_TOMORROW_API_KEY_HERE with your own key
-// and do NOT commit it to GitHub.
 const TOMORROW_TILE_URL_TEMPLATE =
-  'https://api.tomorrow.io/v4/map/tile/{z}/{x}/{y}/precipitationIntensity/{time}.png?apikey=YOUR_TOMORROW_API_KEY_HERE';
+  'https://api.tomorrow.io/v4/map/tile/{z}/{x}/{y}/precipitationIntensity/{time}.png?apikey=ZXyYMmwRq2cognFGiozyfw0XWPo86BMO';
 
 export default function NativeMap({ activeLocation, showRadar = true }: NativeMapProps) {
   const mapRef = useRef<MapView | null>(null);
