@@ -3,6 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
+  Dimensions,
   ActivityIndicator,
   TouchableOpacity,
   Platform,
@@ -15,6 +16,7 @@ import * as Haptics from 'expo-haptics';
 import NativeMap from '@/components/NativeMap';
 import { getColors } from '@/constants/screenSizes';
 
+const { width, height } = Dimensions.get('window');
 const colors = getColors();
 
 export default function MapScreen() {
@@ -30,7 +32,7 @@ export default function MapScreen() {
   }, []);
 
   if (!activeLocation || isLoadingWeather) {
-    const gradientColors = [colors.background.primary, colors.background.secondary, colors.background.tertiary] as const;
+    const gradientColors = [colors.background.primary, colors.background.secondary, colors.background.tertiary];
     return (
       <LinearGradient colors={gradientColors} style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -43,10 +45,25 @@ export default function MapScreen() {
 
   return (
     <View style={styles.container}>
-      <NativeMap
-        activeLocation={activeLocation}
-        showRadar={showRadar}
-      />
+      {Platform.OS === 'web' ? (
+        <View style={styles.map}>
+          <LinearGradient
+            colors={['#0ea5e9', '#38bdf8', '#7dd3fc']}
+            style={StyleSheet.absoluteFill}
+          />
+          <View style={styles.webMapPlaceholder}>
+            <Text style={styles.webMapText}>Interactive Map</Text>
+            <Text style={styles.webMapSubtext}>
+              Maps are available on mobile devices
+            </Text>
+          </View>
+        </View>
+      ) : (
+        <NativeMap
+          activeLocation={activeLocation}
+          showRadar={showRadar}
+        />
+      )}
 
       <View style={styles.controls}>
         <TouchableOpacity
@@ -105,6 +122,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '500',
+  },
+  map: {
+    width,
+    height,
   },
   controls: {
     position: 'absolute',
@@ -177,6 +198,23 @@ const styles = StyleSheet.create({
     fontWeight: '500' as const,
     marginTop: 4,
   },
+  webMapPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  webMapText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: '700' as const,
+  },
+  webMapSubtext: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 14,
+    fontWeight: '500' as const,
+  },
+
 });
 
 

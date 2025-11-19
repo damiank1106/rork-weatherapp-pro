@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Dimensions } from 'react-native';
 import MapView, { PROVIDER_DEFAULT, UrlTile, Marker } from 'react-native-maps';
 
@@ -13,72 +13,13 @@ interface NativeMapProps {
   showRadar?: boolean;
 }
 
-// Number of frames in the animation
-const FRAME_COUNT = 8;
-// How fast to switch frames (ms)
-const FRAME_INTERVAL_MS = 900;
-
-const API_KEY = 'ZXyYMmwRq2cognFGiozyfw0XWPo86BMO';
-
-const TOMORROW_TILE_URL_TEMPLATE =
-  `https://api.tomorrow.io/v4/map/tile/{z}/{x}/{y}/precipitationIntensity/{time}.png?apikey=${API_KEY}`;
-
 export default function NativeMap({ activeLocation, showRadar = true }: NativeMapProps) {
-  const mapRef = useRef<MapView | null>(null);
-
-  // Used to force MapView remount when radar mode changes
+  const mapRef = useRef<MapView>(null);
   const [key, setKey] = useState(0);
 
-  // Animation state: list of timestamps + current index
-  const [frameTimes, setFrameTimes] = useState<string[]>([]);
-  const [frameIndex, setFrameIndex] = useState(0);
-
-  // Build the list of timestamps whenever radar is enabled
   useEffect(() => {
-    if (!showRadar) {
-      return;
-    }
-
-    const now = new Date();
-    const frames: string[] = [];
-
-    // Last ~35 minutes in 5-minute steps (8 frames total)
-    for (let i = FRAME_COUNT - 1; i >= 0; i--) {
-      const t = new Date(now.getTime() - i * 5 * 60 * 1000);
-      frames.push(t.toISOString());
-    }
-
-    setFrameTimes(frames);
-    setFrameIndex(frames.length - 1);
-    setKey(prev => prev + 1); // remount MapView on toggle
-  }, [showRadar, activeLocation.latitude, activeLocation.longitude]);
-
-  // Cycle through the timestamps to create animation
-  useEffect(() => {
-    if (!showRadar || frameTimes.length === 0) {
-      return;
-    }
-
-    const id = setInterval(() => {
-      setFrameIndex(prev => (prev + 1) % frameTimes.length);
-    }, FRAME_INTERVAL_MS);
-
-    return () => clearInterval(id);
-  }, [showRadar, frameTimes]);
-
-  // Build the final URL for the current frame
-  const tileUrl =
-    showRadar && frameTimes.length > 0
-      ? TOMORROW_TILE_URL_TEMPLATE.replace(
-          '{time}',
-          frameTimes[frameIndex]
-        )
-      : null;
-
-  console.log('Tile URL:', tileUrl);
-  console.log('Show Radar:', showRadar);
-  console.log('Frame Times:', frameTimes);
-  console.log('Current Frame Index:', frameIndex);
+    setKey(prev => prev + 1);
+  }, [showRadar]);
 
   return (
     <MapView
@@ -97,23 +38,22 @@ export default function NativeMap({ activeLocation, showRadar = true }: NativeMa
       pitchEnabled
       rotateEnabled
     >
-      {tileUrl && (
+      {showRadar && (
         <UrlTile
-          urlTemplate={tileUrl}
-          maximumZ={12}
-          minimumZ={2}
+          urlTemplate="https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png"
+          maximumZ={10}
+          minimumZ={4}
           tileSize={256}
           zIndex={1}
-          opacity={0.7}
+          opacity={0.6}
         />
       )}
-
       <Marker
         coordinate={{
           latitude: activeLocation.latitude,
           longitude: activeLocation.longitude,
         }}
-        title={activeLocation.isCurrent ? 'Your Location' : 'Location'}
+        title="Your Location"
       />
     </MapView>
   );
