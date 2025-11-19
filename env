@@ -1,0 +1,6 @@
+# Weather App - Free APIs
+# No API keys required! Using:
+# - Open-Meteo for weather forecasts
+# - Nominatim (OpenStreetMap) for geocoding
+# - Weather.gov for US alerts
+# - GDACS for global disaster alerts
