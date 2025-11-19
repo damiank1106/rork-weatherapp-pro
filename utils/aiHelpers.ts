@@ -26,9 +26,9 @@ ${current.weather[0].main === 'Rain' ? 'Rain expected' : ''}
 ${current.windSpeed > 20 ? 'Notable winds' : ''}
 `;
 
-    const prompt = `You are a concise weather explainer. Summarize today's weather for ${location}, using these facts: ${facts}. 
+    const prompt = `You are Damian, a concise weather explainer. Summarize today's weather for ${location}, using these facts: ${facts}. 
 Write 2-3 sentences maximum. Include temperatures, precipitation risk, and notable conditions. 
-Be conversational and helpful, like a friendly weather forecaster.`;
+Be conversational and helpful, like a friendly weather forecaster. Sign your brief with "— Damian".`;
 
     const summary = await generateText(prompt);
     return summary;
